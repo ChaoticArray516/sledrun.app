@@ -1,0 +1,9 @@
+---
+const games = [
+  { href: '/snow-road', title: 'Snow Road 3D' },
+  { href: '/3d-sledding', title: '3D Sledding' },
+];
+---
+<div class="related-games">
+  {games.map((game) => <a class="related-card" href={game.href}><span>{game.title}</span><span aria-hidden="true">→</span></a>)}
+</div>

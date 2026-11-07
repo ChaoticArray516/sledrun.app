@@ -1,0 +1,16 @@
+:root {
+  --color-spruce: #193B3A;
+  --color-spruce-deep: #10281F;
+  --color-glacier: #7FC8D8;
+  --color-glacier-light: #BFE9F2;
+  --color-amber: #D98E3A;
+  --color-coral: #E2604A;
+  --color-cream: #F6F0E4;
+  --color-paper: #FBF7EE;
+  --color-ink: #1F3A3D;
+  --color-muted: #536B68;
+  --color-line: #E7DFCE;
+  --color-hud: rgba(12, 20, 24, .78);
+  --font-ui: Outfit, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-number: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+}

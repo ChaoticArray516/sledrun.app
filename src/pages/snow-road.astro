@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GameShell from '../components/GameShell.astro';
+import PageContent from '../components/PageContent.astro';
+import { snowRoad } from '../content/snow-road';
+import { createSchema } from '../content/schema';
+---
+<BaseLayout title={snowRoad.title} description={snowRoad.description} canonical="https://sledrun.online/snow-road" schema={createSchema(snowRoad)}>
+  <GameShell mode="snowRoad" gameName={snowRoad.gameName} currentPath={snowRoad.path} />
+  <PageContent page={snowRoad} />
+</BaseLayout>

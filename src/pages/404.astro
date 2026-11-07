@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+---
+<BaseLayout title="Page not found" description="The requested page does not exist." canonical="https://sledrun.online/404" robots="noindex, follow">
+  <div class="static-shell"><SiteHeader currentPath="" /></div>
+  <main class="not-found">
+    <img src="/logo_mono.svg" alt="" width="72" height="72">
+    <h1>Page not found</h1>
+    <p>The page you requested does not exist. Choose a game below.</p>
+    <nav aria-label="Choose a game"><a href="/">Sled Rider 3D</a><a href="/snow-road">Snow Road 3D</a><a href="/3d-sledding">3D Sledding</a></nav>
+  </main>
+</BaseLayout>

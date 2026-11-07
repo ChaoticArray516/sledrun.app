@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.wrangler/
+.tools/
+public/game/v1/
+src/generated/game-manifest.json
+.env
+.env.*
+docs/lh-*.json
+deploy/cloudflare/api_token.txt

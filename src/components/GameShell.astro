@@ -1,0 +1,54 @@
+---
+import SiteHeader from './SiteHeader.astro';
+import gameManifest from '../generated/game-manifest.json';
+interface Props {
+  mode: 'home' | 'snowRoad' | 'sledding';
+  gameName: string;
+  currentPath: string;
+}
+const { mode, gameName, currentPath } = Astro.props;
+const entryName = mode === 'snowRoad' ? 'snow-road' : mode;
+const manifest = gameManifest as Record<string, string>;
+const assetBase = (import.meta.env.PUBLIC_GAME_ASSET_BASE ?? '/game/v1').replace(/\/$/, '');
+const scriptSrc = `${assetBase}/${manifest[entryName].split('/').pop()}`;
+---
+<main class="game-shell" data-game-shell data-mode={mode} data-state="loading" data-asset-base={assetBase}>
+  <canvas class="game-canvas" tabindex="0" role="img" aria-label={`${gameName} game canvas`}></canvas>
+  <SiteHeader currentPath={currentPath} />
+  <div class="hud" aria-live="off" hidden>
+    <div class="hud-item hud-distance"><span>Distance</span><strong data-hud="distance">0 m</strong></div>
+    <div class="hud-item hud-score"><span>Score</span><strong data-hud="score">0</strong></div>
+    <div class="hud-controls">
+      {mode === 'home' && <div class="hud-item hud-gifts"><span>Gifts</span><strong data-hud="gifts">0</strong></div>}
+      <button type="button" data-action="sound" aria-label="Turn sound off">Sound on</button>
+      <button type="button" data-action="fullscreen" aria-label="Enter fullscreen">Full</button>
+      <button type="button" data-action="pause" aria-label="Pause game">Pause</button>
+    </div>
+    {mode === 'snowRoad' && <div class="hud-item hud-section"><span>Section</span><strong data-hud="section">1</strong><span data-hud="danger"></span></div>}
+    {mode === 'sledding' && <div class="hud-item hud-combo"><strong data-hud="combo">Combo ×1.00</strong><span data-hud="air"></span></div>}
+  </div>
+  <div class="touch-controls" aria-hidden="true" hidden>
+    <div class="touch-zone touch-left" data-touch="left">HOLD ←</div>
+    <div class="touch-zone touch-right" data-touch="right">HOLD →</div>
+    <span class="touch-hint">Swipe up to jump</span>
+  </div>
+  <section class="game-overlay" data-overlay="bootstrap" aria-live="polite">
+    <div class="state-card">
+      <h2>{gameName}</h2>
+      <div data-loading-only><span class="loading-label">Loading…</span><progress aria-label="Loading game"></progress></div>
+      <button class="primary" type="button" data-action="play" data-start-only hidden>Play</button>
+      <p class="start-best" data-start-only hidden>Best <strong data-best>—</strong></p>
+      <p class="desktop-hint">Steer: ← → / A D<br>Jump: Space</p>
+      <p class="touch-hint-text">Hold left/right · Swipe up to jump</p>
+      <button type="button" data-action="sound" data-start-only hidden>Sound on</button>
+    </div>
+  </section>
+  <section class="game-overlay" data-overlay="paused" hidden>
+    <div class="state-card"><h2>Paused</h2><button class="primary" type="button" data-action="resume">Resume</button><button type="button" data-action="restart">Restart</button><button type="button" data-action="sound">Sound on</button><p>Steer: ← → / A D · Jump: Space</p></div>
+  </section>
+  <section class="game-overlay" data-overlay="gameover" hidden>
+    <div class="state-card"><h2>Run over</h2><p data-new-best hidden>New best</p><dl><div><dt>Distance</dt><dd data-result="distance">0 m</dd></div><div><dt>Score</dt><dd data-result="score">0</dd></div><div><dt>Best</dt><dd data-result="best">—</dd></div>{mode === 'home' && <div><dt>Gifts</dt><dd data-result="gifts">0</dd></div>}{mode === 'sledding' && <div><dt>Best combo</dt><dd data-result="combo">—</dd></div>}</dl><button class="primary" type="button" data-action="restart">Play again</button><button type="button" data-action="back">Back to top</button></div>
+  </section>
+  <section class="game-overlay game-error" data-overlay="error" hidden><div class="state-card"><p data-error-message>Unable to load the game.</p><button class="primary" type="button" data-action="retry">Retry</button></div></section>
+  <script type="module" src={scriptSrc} defer></script>
+</main>

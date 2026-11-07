@@ -1,0 +1,22 @@
+---
+import type { PageContent as PageContentData } from '../content/types';
+import FaqList from './FaqList.astro';
+import RelatedGames from './RelatedGames.astro';
+interface Props { page: PageContentData; showRelated?: boolean; }
+const { page, showRelated = false } = Astro.props;
+---
+<section class="page-content">
+  <div class="reading-column">
+    <h1>{page.gameName}</h1>
+    <p class="lead">{page.lead}</p>
+    {page.sections.map((section) => <section class="content-section">
+      <h2>{section.heading}</h2>
+      {section.paragraphs.map((paragraph) => <p>{paragraph.map((segment) => segment.href ? <a href={segment.href}>{segment.text}</a> : <>{segment.text}</>)}</p>)}
+      {showRelated && section.heading === 'Play More Sledding Games' && <RelatedGames />}
+    </section>)}
+    <section class="content-section faq-section">
+      <h2>{page.faqHeading}</h2>
+      <FaqList items={page.faqs} />
+    </section>
+  </div>
+</section>

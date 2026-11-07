@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 深色山: 低多边形三切面 -->
+  <polygon points="200,108 36,400 200,400" fill="#1A473A"/>
+  <polygon points="200,108 200,400 372,400" fill="#2D6E5A"/>
+  <polygon points="200,108 150,300 258,300" fill="#215848"/>
+  <!-- 雪顶: 浅蓝阴影 -->
+  <polygon points="200,108 168,196 236,196" fill="#D0E7EB"/>
+  <polygon points="168,196 150,240 200,226 236,196" fill="#A7C8C7"/>
+  <!-- 浅色山: 叠在前 -->
+  <polygon points="336,196 176,400 336,400" fill="#66B0C7"/>
+  <polygon points="336,196 336,400 500,400" fill="#7EC4D8"/>
+  <polygon points="336,196 300,320 372,320" fill="#96D4E4"/>
+  <polygon points="336,196 306,252 362,252" fill="#E4F3F6"/>
+  <polygon points="306,252 294,286 336,274 362,252" fill="#CEE9EF"/>
+  <!-- 橙色胶囊: 柔和高光 -->
+  <rect x="180" y="424" width="156" height="48" rx="24" fill="#E09A3C"/>
+  <rect x="188" y="429" width="140" height="8" rx="4" fill="#EBB370"/>
+</svg>

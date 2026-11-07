@@ -1,0 +1,14 @@
+{
+  "name": "sledrun",
+  "pages_build_output_dir": "dist",
+  "compatibility_date": "2026-11-05",
+  "vars": {
+    "PUBLIC_GAME_ASSET_BASE": "/game/v1"
+  },
+  "r2_buckets": [
+    {
+      "binding": "SLEDRUN_ASSETS",
+      "bucket_name": "sledrun-game-assets"
+    }
+  ]
+}

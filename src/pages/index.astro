@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GameShell from '../components/GameShell.astro';
+import PageContent from '../components/PageContent.astro';
+import { home } from '../content/home';
+import { createSchema } from '../content/schema';
+---
+<BaseLayout title={home.title} description={home.description} canonical="https://sledrun.online/" schema={createSchema(home)}>
+  <GameShell mode="home" gameName={home.gameName} currentPath={home.path} />
+  <PageContent page={home} showRelated />
+</BaseLayout>

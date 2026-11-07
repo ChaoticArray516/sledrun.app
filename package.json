@@ -1,0 +1,53 @@
+{
+  "name": "sledrun",
+  "version": "0.1.0",
+  "description": "Original 3D snow sledding game for the browser — Astro, Three.js, Cloudflare Pages/R2.",
+  "homepage": "https://sledrun.pages.dev",
+  "license": "MIT",
+  "keywords": [
+    "astro",
+    "threejs",
+    "webgl",
+    "3d-game",
+    "sledding",
+    "snow",
+    "cloudflare-pages",
+    "cloudflare-r2",
+    "typescript",
+    "seo"
+  ],
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "22.23.4",
+    "npm": ">=10"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build:game": "node scripts/build-game.mjs",
+    "dev:game": "node scripts/build-game.mjs --watch",
+    "assets": "node scripts/generate-assets.mjs",
+    "precheck": "npm run build:game",
+    "check": "astro check",
+    "prebuild": "npm run build:game",
+    "build": "astro build",
+    "preview": "astro preview",
+    "pages:dev": "npm run build && wrangler pages dev dist"
+  },
+  "dependencies": {
+    "astro": "7.4.5",
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.12",
+    "@cloudflare/workers-types": "^5.20261103.1",
+    "@gltf-transform/cli": "4.5.1",
+    "@types/node": "^22.10.0",
+    "@types/three": "^0.187.0",
+    "babylonpress-ktx2-encoder": "^0.6.0",
+    "esbuild": "0.28.2",
+    "sharp": "^0.35.5",
+    "typescript": "^5.9.3",
+    "wrangler": "4.157.0"
+  }
+}
