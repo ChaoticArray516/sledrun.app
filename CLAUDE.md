@@ -1,6 +1,6 @@
 # CLAUDE.md · SledRun 3A 编码入口
 
-> **项目**: SledRun（`https://sledrun.online/`）— 原创 3D 雪橇滑行网页游戏站
+> **项目**: SledRun（`https://sledrun.app/`）— 原创 3D 雪橇滑行网页游戏站
 > **角色**: Kimi Code 是本工程 `workspace/` 内的唯一编码执行者；默认零项目上下文，一切以本文与指定文档为准。
 > **版本**: v1.0 | **日期**: 2026-11-05 | **维护**: 督察书记（Claude Code）
 > **路径约定**: 文档路径相对项目根 `projs/sledrun_3d/`；工程内文件相对 `workspace/`。从 `workspace/` 读取文档时前缀 `../`。
@@ -11,7 +11,7 @@
 
 | 项 | 定案 |
 |---|---|
-| 品牌/主域 | **SledRun** / **`sledrun.online`**（用户确认持有） |
+| 品牌/主域 | **SledRun** / **`sledrun.app`**（用户确认持有） |
 | 产品 | 原创 3D 雪橇滑行网页游戏站；首页即玩；三页都可玩 |
 | 3A 路由 | `/`、`/snow-road`、`/3d-sledding` + 真实 404 |
 | 玩法 | 一套引擎 + 三组配置：经典无尽 / 窄道 / 下坡连击 |

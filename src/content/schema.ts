@@ -1,6 +1,6 @@
 import { plainText, type PageContent } from './types';
 
-const origin = 'https://sledrun.online';
+const origin = 'https://sledrun.app';
 
 function faqSchema(page: PageContent) {
   const id = page.path === '/' ? `${origin}/#faq` : `${origin}${page.path}#faq`;

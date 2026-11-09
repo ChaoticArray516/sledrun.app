@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sledrun.online/sitemap.xml
+Sitemap: https://sledrun.app/sitemap.xml

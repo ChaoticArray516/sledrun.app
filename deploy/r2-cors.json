@@ -2,7 +2,7 @@
   "rules": [
     {
       "allowed": {
-        "origins": ["https://sledrun.online", "https://www.sledrun.online"],
+        "origins": ["https://sledrun.app", "https://www.sledrun.app"],
         "methods": ["GET", "HEAD"],
         "headers": ["*"]
       },

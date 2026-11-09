@@ -60,7 +60,7 @@ powershell -ExecutionPolicy Bypass -File scripts\deploy-pages.ps1 -SyncR2 -Insec
 | 首次成功 deployment | `72a21c9d-d77d-4228-8e97-01c37621b3ee` |
 | 预览域 | `https://72a21c9d.sledrun.pages.dev` |
 | R2 bucket | `sledrun-game-assets`（已创建） |
-| R2 CORS | `deploy/r2-cors.json`（rules schema，允许 `sledrun.online` / `www`） |
+| R2 CORS | `deploy/r2-cors.json`（rules schema，允许 `sledrun.app` / `www`） |
 | R2 对象 | 10 个：3 个 entry + chunk + world.glb + basis 2 + draco 3 |
 
 ## 已知坑
@@ -70,7 +70,7 @@ powershell -ExecutionPolicy Bypass -File scripts\deploy-pages.ps1 -SyncR2 -Insec
 - **R2 CORS 格式**：Wrangler 4.157 要求 `{ "rules": [ { "allowed": { "origins": [...], "methods": [...] } } ] }`，不是 S3 的 `AllowedOrigins`。
 - **Windows `fetch failed`**：R2 大文件/连续上传偶发；脚本已重试。仅本机可用 `-InsecureTls`，CI 不要用。
 - **Node 版本**：系统默认 Node 22.14 低于 `engines` 要求；脚本自动前置隔离 Node 22.23.4。
-- **自定义域**：当前账户 zone 列表里没有 `sledrun.online`，不能由本 token 自动绑域；需用户把 zone 加入 Cloudflare 或手动绑定 Custom Domain。
+- **自定义域**：当前账户 zone 列表里没有 `sledrun.app`，不能由本 token 自动绑域；需用户把 zone 加入 Cloudflare 或手动绑定 Custom Domain。
 
 ## 安全
 

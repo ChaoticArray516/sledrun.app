@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://sledrun.online',
+  site: 'https://sledrun.app',
   output: 'static',
   trailingSlash: 'never',
   build: {

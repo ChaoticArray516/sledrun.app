@@ -2,7 +2,7 @@
 
 An original 3D snow sledding game for the browser.
 
-**Play:** https://sledrun.pages.dev
+**Play:** https://sledrun.app
 
 ![SledRun start screen](docs/screenshots/home-start.png)
 
@@ -31,7 +31,7 @@ An original 3D snow sledding game for the browser.
 ## Live
 
 - Demo: **https://sledrun.pages.dev**
-- Intended production domain: **https://sledrun.online** (custom-domain binding pending)
+- Production: **https://sledrun.app**
 
 ## Local development
 

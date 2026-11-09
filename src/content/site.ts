@@ -1,6 +1,6 @@
 export const site = {
   name: 'SledRun',
-  origin: 'https://sledrun.online',
+  origin: 'https://sledrun.app',
   nav: [
     { href: '/', label: 'Sled Rider 3D' },
     { href: '/snow-road', label: 'Snow Road 3D' },

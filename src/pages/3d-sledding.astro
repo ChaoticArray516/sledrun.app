@@ -5,7 +5,7 @@ import PageContent from '../components/PageContent.astro';
 import { sledding } from '../content/3d-sledding';
 import { createSchema } from '../content/schema';
 ---
-<BaseLayout title={sledding.title} description={sledding.description} canonical="https://sledrun.online/3d-sledding" schema={createSchema(sledding)}>
+<BaseLayout title={sledding.title} description={sledding.description} canonical="https://sledrun.app/3d-sledding" schema={createSchema(sledding)}>
   <GameShell mode="sledding" gameName={sledding.gameName} currentPath={sledding.path} />
   <PageContent page={sledding} />
 </BaseLayout>

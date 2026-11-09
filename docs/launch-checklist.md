@@ -28,7 +28,7 @@ done
 ```
 
 - [ ] R2 文件逐项上传成功；hash/版本目录保持不覆盖旧版。
-- [ ] CORS 只允许 `https://sledrun.online`；批准的预览域另行登记。
+- [ ] CORS 只允许 `https://sledrun.app`；批准的预览域另行登记。
 - [ ] hash/版本资源返回 `Cache-Control: public, max-age=31536000, immutable`。
 
 ## Pages 发布（授权后执行）
@@ -42,7 +42,7 @@ npx wrangler pages deploy dist --project-name sledrun
 - [ ] 记录 deployment ID、时间和构建提交/文件版本。
 - [ ] 三页 200；`/unknown` 404；`/snow-road/`、`/3d-sledding/` 301 到无斜杠。
 - [ ] TLS、canonical、sitemap、robots、JSON-LD 和 10 条内链线上复核。
-- [ ] `https://sledrun.online/og.png` 与 favicon 返回 200，OG 为 1200×630；完成后才可关闭 Q12。
+- [ ] `https://sledrun.app/og.png` 与 favicon 返回 200，OG 为 1200×630；完成后才可关闭 Q12。
 - [ ] 游戏 bundle、GLB、DRACO/KTX2 解码器均从 R2 返回 200，CORS 无错误。
 - [ ] 真机验证触控、重开、帧率和首屏可玩资源；未测项保留待测。
 
@@ -63,6 +63,6 @@ npx wrangler pages deploy dist --project-name sledrun
   - `/og.png`、`/favicon.ico` → 200
   - `/game/v1/home-MPI2L3TH.js`、`world.glb`、`draco_decoder.wasm` → 200，R2 命中
 - R2 `sledrun-game-assets` 已创建，10 个对象上传，CORS `rules` 已设置。
-- 未完成：自定义域 `sledrun.online`（当前 token 所在账户没有该 zone）、TLS/GSC、回滚演练、真机 INP/TTFB/帧率、WebPageTest。
+- 未完成：自定义域 `sledrun.app`（当前 token 所在账户没有该 zone）、TLS/GSC、回滚演练、真机 INP/TTFB/帧率、WebPageTest。
 - 首次部署曾因 `R2 bucket 'sledrun-game-assets' not found` 失败；创建并上传后重试成功。
 - 部署脚本：`workspace/scripts/deploy-pages.ps1`；项目内 Skill：`workspace/.claude/skills/deploy-cloudflare-pages/SKILL.md`。
