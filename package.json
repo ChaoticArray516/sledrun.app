@@ -27,6 +27,7 @@
     "build:game": "node scripts/build-game.mjs",
     "dev:game": "node scripts/build-game.mjs --watch",
     "assets": "node scripts/generate-assets.mjs",
+    "prepare:assets": "node scripts/prepare-delivery-assets.mjs",
     "precheck": "npm run build:game",
     "check": "astro check",
     "prebuild": "npm run build:game",

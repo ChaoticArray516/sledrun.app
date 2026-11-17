@@ -1,0 +1,1 @@
+import{a as e}from"./chunks/chunk-4EWHXUMV.js";var o={mode:"home",gameName:"Sled Rider 3D",seed:4101,roadWidth:12,baseSpeed:14,maxSpeed:34,steering:8,gravity:20,jumpVelocity:8,spawnAhead:260,sky:8374488,fog:12577266,snow:16183524,accent:14257722};e(o);

@@ -36,9 +36,16 @@ function Read-CloudflareCredentials {
 
 function Invoke-Wrangler {
   param([string[]]$Arguments)
-  $output = & npx --no-install wrangler @Arguments 2>&1 | Out-String
+  $previousErrorActionPreference = $ErrorActionPreference
+  try {
+    $ErrorActionPreference = 'Continue'
+    $output = & npx --no-install wrangler @Arguments 2>&1 | Out-String
+    $exitCode = $LASTEXITCODE
+  } finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+  }
   Write-Host $output.Trim()
-  return @{ ExitCode = $LASTEXITCODE; Output = $output }
+  return @{ ExitCode = $exitCode; Output = $output }
 }
 
 function Invoke-WithRetry {
@@ -57,11 +64,23 @@ function Invoke-WithRetry {
   throw "$Label failed after $MaxRetries attempts"
 }
 
+function Get-GameContentType {
+  param([string]$Extension)
+  switch ($Extension.ToLowerInvariant()) {
+    '.js' { return 'text/javascript; charset=utf-8' }
+    '.wasm' { return 'application/wasm' }
+    '.glb' { return 'model/gltf-binary' }
+    '.png' { return 'image/png' }
+    default { throw "Unsupported game asset type: $Extension" }
+  }
+}
+
 function Sync-R2Assets {
   Write-Step 'R2 bucket and assets'
   $bucket = 'sledrun-game-assets'
   $corsFile = Join-Path $projectRoot 'deploy\r2-cors.json'
-  $assetRoot = Join-Path $projectRoot 'public\game\v1'
+  $assetVersion = 'v2'
+  $assetRoot = Join-Path $projectRoot "public\game\$assetVersion"
 
   if (-not (Test-Path -LiteralPath $assetRoot)) {
     throw "Game assets not found: $assetRoot. Run npm run build:game first."
@@ -77,13 +96,14 @@ function Sync-R2Assets {
 
   foreach ($file in $files) {
     $rel = $file.FullName.Substring($base.Length + 1).Replace('\', '/')
-    $key = "v1/$rel"
+    $key = "$assetVersion/$rel"
+    $contentType = Get-GameContentType $file.Extension
     $result = Invoke-WithRetry -Label "upload $key" -Action {
-      Invoke-Wrangler @('r2', 'object', 'put', "$bucket/$key", '--file', $file.FullName, '--remote', '--force')
+      Invoke-Wrangler @('r2', 'object', 'put', "$bucket/$key", '--file', $file.FullName, '--content-type', $contentType, '--cache-control', 'public, max-age=31536000, immutable', '--remote', '--force')
     }
     if ($result.ExitCode -ne 0) { throw "R2 upload failed: $key" }
   }
-  Write-Host "R2 assets uploaded: $($files.Count) files"
+  Write-Host "R2 assets uploaded: $($files.Count) files ($assetVersion)"
 }
 
 function Test-DeployedUrl {
@@ -139,23 +159,34 @@ try {
   $deploymentUrl = if ($urlMatch.Success) { $urlMatch.Value } else { "https://$ProjectName.pages.dev" }
 
   Write-Step 'Verify'
+  $assetVersion = 'v2'
+  $manifest = Get-Content -LiteralPath (Join-Path $projectRoot 'src\generated\game-manifest.json') -Raw | ConvertFrom-Json
+  foreach ($entry in @($manifest.home, $manifest.'snow-road', $manifest.sledding)) {
+    if (-not $entry.StartsWith("/game/$assetVersion/")) { throw "Unexpected asset version in manifest: $entry" }
+  }
+  $chunk = Get-ChildItem -LiteralPath (Join-Path $projectRoot "public\game\$assetVersion\chunks") -Filter '*.js' -File | Select-Object -First 1
+  if (-not $chunk) { throw 'No shared game chunk found for verification' }
   $checks = @(
-    "$deploymentUrl/",
-    "$deploymentUrl/snow-road",
-    "$deploymentUrl/3d-sledding",
-    "$deploymentUrl/unknown",
-    "$deploymentUrl/snow-road/",
-    "$deploymentUrl/og.png",
-    "$deploymentUrl/favicon.ico",
-    "$deploymentUrl/game/v1/home-MPI2L3TH.js"
+    @{ Url = "$deploymentUrl/"; Status = 200 },
+    @{ Url = "$deploymentUrl/snow-road"; Status = 200 },
+    @{ Url = "$deploymentUrl/3d-sledding"; Status = 200 },
+    @{ Url = "$deploymentUrl/unknown"; Status = 404 },
+    @{ Url = "$deploymentUrl/snow-road/"; Status = 301 },
+    @{ Url = "$deploymentUrl/og.png"; Status = 200; ContentType = 'image/png' },
+    @{ Url = "$deploymentUrl/favicon.ico"; Status = 200 },
+    @{ Url = "$deploymentUrl$($manifest.home)"; Status = 200; ContentType = 'text/javascript' },
+    @{ Url = "$deploymentUrl/game/$assetVersion/chunks/$($chunk.Name)"; Status = 200; ContentType = 'text/javascript' },
+    @{ Url = "$deploymentUrl/game/$assetVersion/assets/world.glb"; Status = 200; ContentType = 'model/gltf-binary' },
+    @{ Url = "$deploymentUrl/game/$assetVersion/draco/draco_decoder.wasm"; Status = 200; ContentType = 'application/wasm' },
+    @{ Url = "$deploymentUrl/game/$assetVersion/basis/basis_transcoder.wasm"; Status = 200; ContentType = 'application/wasm' }
   )
-  foreach ($url in $checks) {
-    try {
-      $r = Test-DeployedUrl $url
-      $suffix = if ($r.Location) { " -> $($r.Location)" } else { '' }
-      Write-Host ("{0} {1}{2}" -f $r.Status, $url, $suffix)
-    } catch {
-      Write-Host "ERR $url : $($_.Exception.Message)"
+  foreach ($check in $checks) {
+    $r = Test-DeployedUrl $check.Url
+    $suffix = if ($r.Location) { " -> $($r.Location)" } else { '' }
+    Write-Host ("{0} {1} {2}{3}" -f $r.Status, $r.ContentType, $check.Url, $suffix)
+    if ($r.Status -ne $check.Status) { throw "Unexpected status for $($check.Url): expected $($check.Status), got $($r.Status)" }
+    if ($check.ContentType -and $r.ContentType -notlike "$($check.ContentType)*") {
+      throw "Unexpected Content-Type for $($check.Url): expected $($check.ContentType), got $($r.ContentType)"
     }
   }
 

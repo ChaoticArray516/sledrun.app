@@ -7,6 +7,8 @@ export function bootstrap(config: GameConfig): void {
   performance.mark('game-bootstrap-start');
   requestAnimationFrame(() => {
     performance.mark('game-static-painted');
-    void GameEngine.create(shell, config).catch(() => { });
+    void GameEngine.create(shell, config).catch((error) => {
+      console.error('Game bootstrap failed', error);
+    });
   });
 }

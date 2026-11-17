@@ -58,21 +58,20 @@ export class GameEngine {
   }
 
   static async create(shell: HTMLElement, config: GameConfig): Promise<GameEngine> {
-    const base = shell.dataset.assetBase ?? '/game/v1';
-    performance.mark('renderer-start');
-    const view = new Renderer(shell, config);
-    performance.mark('renderer-created');
-    performance.measure('renderer-create', 'renderer-start', 'renderer-created');
+    const base = shell.dataset.assetBase ?? '/game/v2';
     try {
+      performance.mark('renderer-start');
+      const view = new Renderer(shell, config);
+      performance.mark('renderer-created');
+      performance.measure('renderer-create', 'renderer-start', 'renderer-created');
       await view.loadAssets(base, (loaded, total) => {
         const progress = shell.querySelector<HTMLProgressElement>('progress');
         if (progress && total > 0) { progress.max = total; progress.value = loaded; }
       });
       return new GameEngine(shell, config, view);
     } catch (error) {
-      console.error(error);
+      console.error('Game initialization failed', error);
       new Overlays(shell).error('The 3D game could not load. Check your connection and try again.');
-      shell.querySelector<HTMLButtonElement>('[data-action="retry"]')?.addEventListener('click', () => window.location.reload(), { once: true });
       throw error;
     }
   }

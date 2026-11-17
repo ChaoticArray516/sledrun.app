@@ -1,0 +1,1 @@
+import{a as e}from"./chunks/chunk-4EWHXUMV.js";var o={mode:"sledding",gameName:"3D Sledding",seed:6303,roadWidth:14,baseSpeed:18,maxSpeed:40,steering:6,gravity:9.8,jumpVelocity:8,spawnAhead:280,sky:1653562,fog:8374488,snow:16183524,accent:14257722};e(o);

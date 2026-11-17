@@ -36,7 +36,7 @@ function ridgeGeometry(seed: number, snow: boolean): THREE.BufferGeometry {
 }
 
 export class Terrain {
-  readonly ground: THREE.Mesh;
+  readonly ground: THREE.Mesh | THREE.InstancedMesh;
 
   heightAt(x: number, worldZ: number): number {
     const edge = THREE.MathUtils.smoothstep(Math.abs(x), this.config.roadWidth * 0.42, this.visual.terrainWidth * 0.46);
@@ -46,23 +46,34 @@ export class Terrain {
     return central + side + downhill;
   }
 
-  constructor(private scene: THREE.Scene, private config: GameConfig, private visual: VisualConfig, prototypes: Map<string, THREE.Object3D>) {
-    const geometry = new THREE.PlaneGeometry(visual.terrainWidth, 260, 32, 80);
-    const positions = geometry.attributes.position;
-    const colors: number[] = [];
-    for (let i = 0; i < positions.count; i++) {
-      const x = positions.getX(i);
-      const worldZ = -positions.getY(i);
-      const height = this.heightAt(x, worldZ);
-      positions.setZ(i, height);
-      const shade = new THREE.Color(config.snow).lerp(new THREE.Color(0xbfe9f2), Math.min(0.32, Math.abs(x) / visual.terrainWidth * 0.38 + Math.abs(height) * 0.1));
-      colors.push(shade.r, shade.g, shade.b);
+  constructor(private scene: THREE.Scene, private config: GameConfig, private visual: VisualConfig, prototypes: Map<string, THREE.Object3D>, terrainMesh?: THREE.Mesh) {
+    if (terrainMesh) {
+      const groundInstances = new THREE.InstancedMesh(terrainMesh.geometry, terrainMesh.material, 6);
+      const matrix = new THREE.Matrix4();
+      for (let i = 0; i < 6; i++) {
+        matrix.makeTranslation(0, -1.6 * i, -64 * i);
+        groundInstances.setMatrixAt(i, matrix);
+      }
+      groundInstances.instanceMatrix.needsUpdate = true;
+      this.ground = groundInstances;
+    } else {
+      const geometry = new THREE.PlaneGeometry(visual.terrainWidth, 260, 32, 80);
+      const positions = geometry.attributes.position;
+      const colors: number[] = [];
+      for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i);
+        const worldZ = -positions.getY(i);
+        const height = this.heightAt(x, worldZ);
+        positions.setZ(i, height);
+        const shade = new THREE.Color(config.snow).lerp(new THREE.Color(0xbfe9f2), Math.min(0.32, Math.abs(x) / visual.terrainWidth * 0.38 + Math.abs(height) * 0.1));
+        colors.push(shade.r, shade.g, shade.b);
+      }
+      geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+      geometry.computeVertexNormals();
+      this.ground = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: 0.94, flatShading: false }));
+      this.ground.rotation.x = -Math.PI / 2;
+      this.ground.position.set(0, -0.03, -110);
     }
-    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    geometry.computeVertexNormals();
-    this.ground = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: 0.94, flatShading: false }));
-    this.ground.rotation.x = -Math.PI / 2;
-    this.ground.position.set(0, -0.03, -110);
     scene.add(this.ground);
     this.addMountains();
     this.addPines(prototypes);

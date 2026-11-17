@@ -1,6 +1,6 @@
-# SledRun 3A 检查报告
+# SledRun 3A / P0 检查报告
 
-生成时间：2026-11-09T08:21:29.927Z
+生成时间：2026-11-17T08:47:17.839Z
 
 | 检查 | 结果 | 证据 |
 |---|---|---|
@@ -20,32 +20,29 @@
 | sitemap/robots/404 | PASS | dist/ 与源码对账 |
 | OG 1200×630 与七件品牌资产 | PASS | dist/ 与源码对账 |
 | 页面层零游戏 import；广告/旧存档/榜单扫描 | PASS | dist/ 与源码对账 |
-| home 独立 bundle gzip | PASS | 229 bytes |
+| home 独立 bundle gzip | PASS | 228 bytes |
 | snow-road 独立 bundle gzip | PASS | 234 bytes |
 | sledding 独立 bundle gzip | PASS | 229 bytes |
-| GLB 含 DRACO 与 KTX2/Basis 扩展 | PASS | 35156 bytes |
+| 资源版本、MIME 与 GLB 压缩扩展 | PASS | 35156 bytes |
 
 ## 浏览器实测
 
-- 首页：真实 Start/Playing/GameOver，77m 记录写入 home。
-- Snow Road：真实键盘操作，62m 结算写入 snowRoad。
-- 3D Sledding：175m / 224 分结算，奖励事件已触发。
-- 390×844：scrollWidth=390，canvas/visualViewport=844，触控层显示。
-- 844×390、768×1024、1440×900：无页面级横滚，画布等于可视视口。
-- 截图：docs/screenshots/。
+- v2 本地 Pages：三页真实 Start/Playing/Paused/Resume/GameOver/Play again 通过；首页 77m、Snow Road 41m、3D Sledding 175m，存档分模式写入。
+- 390×844：Playing 下 scrollWidth=390，canvas/visualViewport=844，触控层显示；无页面级横滚。
+- 入口资源被阻断时，20 秒看门狗显示 Error + Retry；解除阻断后 Retry 恢复 Start 与 game-ready。
+- 2026-11-16 正式域 sledrun.app：三页完整状态链、GameOver、Play again 和独立存档再次通过。
 
 ## Pages 与性能实测
 
-- Wrangler Pages：三页 200；/unknown 404；/snow-road/ 301 到 /snow-road；OG 200。
+- Pages v2 部署预览：https://5a2502e6.sledrun.pages.dev；三页 200、/unknown 404、尾斜杠 301、OG/favicon 200。
+- R2 v2 上传 10 对象；入口/chunk 为 text/javascript，GLB 为 model/gltf-binary，DRACO/Basis WASM 为 application/wasm；v1 保留回滚。
 - 安全头：CSP、nosniff、Referrer-Policy、Permissions-Policy 已返回。
-- LCP trace 修复后三次 Lighthouse：95/98/97；LCP 中位数 773.5ms；TBT 中位数 184ms；CLS 0.002454；总下载中位数 566467 bytes；本地性能闸通过。
-- Loading/Start 持续 DOM 与 trace 详见 prompts/dev_piplines/ui_design/uiux/3d_extend/lcp_trace_report.md。
-- 主共享游戏 chunk gzip 约 193.7KB；GLB 13648 bytes，含 DRACO/KTX2。
-- 视觉复核详见 prompts/dev_piplines/ui_design/uiux/3d_extend/visual_review_report.md。
+- 既有 3A 本地 Lighthouse 证据：95/98/97；LCP 中位数 773.5ms；TBT 中位数 184ms；CLS 0.002454。当前 P0 未重新运行 Lighthouse。
+- 主共享游戏 chunk gzip 约 193.7KB；GLB 35156 bytes，含 DRACO/KTX2。
 - 解码器另载；完整首屏 JS、INP、TTFB 和帧率仍需按目标环境复核。
 
 ## 待测
 
-- WebPageTest、中端 Android 真机、Cloudflare 线上 301/404/TLS/R2 与回滚尚未实测。
-- Q12 需线上 OG URL 验收后才能关闭。
+- WebPageTest、中端 Android 真机、完整线上 INP/TTFB/帧率与回滚演练尚未完成。
+- 本次仅关闭 P0 可玩性故障，不代表其他 3B 功能或全量性能验收完成。
 

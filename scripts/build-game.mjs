@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const isWatch = process.argv.includes('--watch');
-const outdir = path.join(root, 'public/game/v1');
+const outdir = path.join(root, 'public/game/v2');
 const manifestPath = path.join(root, 'src/generated/game-manifest.json');
 const entries = ['home', 'snow-road', 'sledding'];
 

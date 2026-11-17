@@ -20,7 +20,7 @@ description: |
 | 输出目录 | `dist/` |
 | R2 bucket | `sledrun-game-assets` |
 | R2 binding | `SLEDRUN_ASSETS`（`wrangler.jsonc`） |
-| 资源前缀 | `public/game/v1/**` → R2 key `v1/**` |
+| 资源前缀 | `public/game/v2/**` → R2 key `v2/**` |
 | Node | `22.23.4`（`.nvmrc`；本机隔离路径 `H:\sdkpkg\webArch\ClientSide\npm\node-v22.23.4\node-v22.23.4-win-x64`） |
 | 凭证 | `projs/sledrun_3d/deploy/cloudflare/api_token.txt`（**仓库外，绝不提交**） |
 
@@ -36,7 +36,7 @@ powershell -ExecutionPolicy Bypass -File scripts\deploy-pages.ps1 -SyncR2 -Insec
 | 参数 | 用途 |
 |---|---|
 | `-SkipBuild` | 跳过 `npm run check/build/check.mjs`，直接部署现有 `dist/` |
-| `-SyncR2` | 创建 bucket、设 CORS、上传 `public/game/v1/**` |
+| `-SyncR2` | 创建 bucket、设 CORS、上传 `public/game/v2/**` |
 | `-InsecureTls` | 仅本机 Windows 遇到 `wrangler fetch failed` 时临时用；CI 禁用 |
 | `-MaxRetries` | 部署/上传重试次数，默认 5 |
 | `-NodeDir` | Node 22.23.4 路径；默认已指向隔离目录 |
@@ -48,7 +48,7 @@ powershell -ExecutionPolicy Bypass -File scripts\deploy-pages.ps1 -SyncR2 -Insec
 3. `npm run check` → `npm run build` → `node scripts/check.mjs`。
 4. 可选：`wrangler r2 bucket create` → `cors set` → 逐文件 `r2 object put --remote`。
 5. `wrangler pages deploy dist --project-name sledrun --branch main`。
-6. 线上验证：三页 200、`/unknown` 404、带尾斜杠 301、OG/favicon 200、`/game/v1/*` 200。
+6. 线上验证：三页 200、`/unknown` 404、带尾斜杠 301、OG/favicon 200、`/game/v2/*` 200。
 
 ## 当前部署记录
 
@@ -56,12 +56,13 @@ powershell -ExecutionPolicy Bypass -File scripts\deploy-pages.ps1 -SyncR2 -Insec
 |---|---|
 | Pages 项目 | `sledrun`（已创建） |
 | 生产域 | `https://sledrun.pages.dev` |
-| 最新 deployment | `d765866b-114e-4964-8649-4e00a0da3a3b`（2026-11-07T14:27:44Z，脚本验证部署） |
+| 最新 deployment | `32a0168b`（2026-11-17，人物/地形 v2 + R2 同步，12 项线上验证全过；预览 `https://32a0168b.sledrun.pages.dev`） |
+| 上一 deployment | `5a2502e6`（2026-11-16，P0 可玩性修复） |
+| 上一脚本验证部署 | `d765866b-114e-4964-8649-4e00a0da3a3b`（2026-11-07T14:27:44Z） |
 | 首次成功 deployment | `72a21c9d-d77d-4228-8e97-01c37621b3ee` |
-| 预览域 | `https://72a21c9d.sledrun.pages.dev` |
 | R2 bucket | `sledrun-game-assets`（已创建） |
 | R2 CORS | `deploy/r2-cors.json`（rules schema，允许 `sledrun.app` / `www`） |
-| R2 对象 | 10 个：3 个 entry + chunk + world.glb + basis 2 + draco 3 |
+| R2 对象 | 当前 `v2` 10 个；旧 `v1` 10 个保留回滚；上传与函数均显式校正 MIME |
 
 ## 已知坑
 

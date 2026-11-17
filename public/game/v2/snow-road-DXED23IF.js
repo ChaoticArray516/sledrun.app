@@ -1,0 +1,1 @@
+import{a as o}from"./chunks/chunk-4EWHXUMV.js";var e={mode:"snowRoad",gameName:"Snow Road 3D",seed:5202,roadWidth:3.2,baseSpeed:20,maxSpeed:30,steering:18,gravity:20,jumpVelocity:8,spawnAhead:240,sky:5466984,fog:8359562,snow:12577266,accent:14835786};o(e);

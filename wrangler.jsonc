@@ -3,7 +3,7 @@
   "pages_build_output_dir": "dist",
   "compatibility_date": "2026-11-05",
   "vars": {
-    "PUBLIC_GAME_ASSET_BASE": "/game/v1"
+    "PUBLIC_GAME_ASSET_BASE": "/game/v2"
   },
   "r2_buckets": [
     {

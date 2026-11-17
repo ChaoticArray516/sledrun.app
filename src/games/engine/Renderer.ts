@@ -57,14 +57,14 @@ export class Renderer {
   async loadAssets(base: string, onProgress: (loaded: number, total: number) => void): Promise<void> {
     const assets = await new Assets(base, this.renderer).load(onProgress);
     for (const [name, object] of assets.prototypes) this.prototypes.set(name, object);
-    const sledPrototype = this.prototypes.get('sled');
+    const sledPrototype = assets.rider ?? this.prototypes.get('sled');
     if (sledPrototype) {
       this.sled = sledPrototype.clone();
       this.sled.scale.setScalar(this.shell.clientWidth >= 1024 ? 1.25 : 1);
       this.rig = new SledRig(this.sled);
       this.scene.add(this.sled);
     }
-    this.terrain = new Terrain(this.scene, this.config, this.visual, this.prototypes);
+    this.terrain = new Terrain(this.scene, this.config, this.visual, this.prototypes, assets.terrainMesh);
     performance.mark('terrain-created');
     performance.measure('terrain-create', 'assets-loaded', 'terrain-created');
     this.vfx = new Vfx(this.scene, (x, z) => this.heightAt(x, z));
@@ -104,9 +104,11 @@ export class Renderer {
   update(x: number, y: number, steer: number, distance: number, roadWidth: number, dt: number): void {
     if (this.sled) this.sled.position.set(x, y + this.heightAt(x, 0), 0);
     this.rig?.update(steer, y > 0.05, dt);
-    this.camera.position.x += ((x * 0.28) - this.camera.position.x) * 0.08;
+    const mobile = this.shell.clientWidth < 768;
+    const cameraFollow = mobile ? 0.82 : 0.28;
+    this.camera.position.x += ((x * cameraFollow) - this.camera.position.x) * 0.08;
     this.camera.position.y = this.visual.cameraHeight + y * 0.16;
-    this.camera.lookAt(x * 0.38, y + 0.9, -this.visual.lookAhead);
+    this.camera.lookAt(x * (mobile ? 0.82 : 0.38), y + 0.9, -this.visual.lookAhead);
     this.terrain?.update(roadWidth);
     this.vfx?.update(dt, x, y, distance, this.shell.dataset.state === 'playing');
   }

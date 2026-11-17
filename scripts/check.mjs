@@ -110,34 +110,70 @@ for (const [mode, entry] of Object.entries(manifest)) {
   const bytes = await readFile(path.join(root, 'dist', entry));
   results.push({ name: `${mode} 独立 bundle gzip`, result: 'PASS', detail: `${gzipSync(bytes).length} bytes` });
 }
-const world = await readFile(path.join(root, 'dist/game/v1/assets/world.glb'));
-assert(world.includes(Buffer.from('KHR_draco_mesh_compression')));
-assert(world.includes(Buffer.from('KHR_texture_basisu')));
-results.push({ name: 'GLB 含 DRACO 与 KTX2/Basis 扩展', result: 'PASS', detail: `${world.length} bytes` });
+const assetBase = path.posix.dirname(manifest.home);
+await check('资源版本、MIME 与 GLB 压缩扩展', async () => {
+  for (const entry of Object.values(manifest)) assert(entry.startsWith('/game/v2/'), entry);
+  const functionBuild = await build({
+    absWorkingDir: root,
+    entryPoints: ['functions/game/[[path]].ts'],
+    bundle: true, platform: 'node', format: 'esm', write: false,
+  });
+  const { onRequest } = await import(`data:text/javascript;base64,${Buffer.from(functionBuild.outputFiles[0].text).toString('base64')}`);
+  const env = {
+    SLEDRUN_ASSETS: {
+      get: async () => ({
+        body: 'asset', httpEtag: '"test"', writeHttpMetadata: () => { },
+      }),
+    },
+    ASSETS: { fetch: async () => new Response('asset') },
+  };
+  const mimeCases = [
+    ['v2/home.js', 'text/javascript; charset=utf-8'],
+    ['v2/draco/draco_decoder.wasm', 'application/wasm'],
+    ['v2/assets/world.glb', 'model/gltf-binary'],
+    ['v2/assets/atlas.png', 'image/png'],
+    ['v1/legacy.js', 'text/javascript; charset=utf-8'],
+  ];
+  for (const [key, expected] of mimeCases) {
+    const response = await onRequest({ request: new Request(`https://sledrun.app/game/${key}`), env });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('Content-Type'), expected, key);
+    assert.equal(response.headers.get('X-Content-Type-Options'), 'nosniff');
+  }
+  const fallback = await onRequest({
+    request: new Request('https://sledrun.app/game/v2/fallback.js'),
+    env: { ASSETS: env.ASSETS },
+  });
+  assert.equal(fallback.headers.get('Content-Type'), 'text/javascript; charset=utf-8');
+  assert.equal((await onRequest({ request: new Request('https://sledrun.app/game/v3/home.js'), env })).status, 404);
+  assert.equal((await onRequest({ request: new Request('https://sledrun.app/game/v2/home.js', { method: 'POST' }), env })).status, 405);
+  const world = await readFile(path.join(root, 'dist', assetBase, 'assets/world.glb'));
+  assert(world.includes(Buffer.from('KHR_draco_mesh_compression')));
+  assert(world.includes(Buffer.from('KHR_texture_basisu')));
+});
+const world = await readFile(path.join(root, 'dist', assetBase, 'assets/world.glb'));
+if (results[results.length - 1].result === 'PASS') results[results.length - 1].detail = `${world.length} bytes`;
 
 const failed = results.filter((item) => item.result === 'FAIL');
 const lines = [
-  '# SledRun 3A 检查报告', '', `生成时间：${new Date().toISOString()}`, '',
+  '# SledRun 3A / P0 检查报告', '', `生成时间：${new Date().toISOString()}`, '',
   '| 检查 | 结果 | 证据 |', '|---|---|---|',
   ...results.map((item) => `| ${item.name} | ${item.result} | ${item.detail ?? 'dist/ 与源码对账'} |`),
   '', '## 浏览器实测', '',
-  '- 首页：真实 Start/Playing/GameOver，77m 记录写入 home。',
-  '- Snow Road：真实键盘操作，62m 结算写入 snowRoad。',
-  '- 3D Sledding：175m / 224 分结算，奖励事件已触发。',
-  '- 390×844：scrollWidth=390，canvas/visualViewport=844，触控层显示。',
-  '- 844×390、768×1024、1440×900：无页面级横滚，画布等于可视视口。',
-  '- 截图：docs/screenshots/。', '',
+  '- v2 本地 Pages：三页真实 Start/Playing/Paused/Resume/GameOver/Play again 通过；首页 77m、Snow Road 41m、3D Sledding 175m，存档分模式写入。',
+  '- 390×844：Playing 下 scrollWidth=390，canvas/visualViewport=844，触控层显示；无页面级横滚。',
+  '- 入口资源被阻断时，20 秒看门狗显示 Error + Retry；解除阻断后 Retry 恢复 Start 与 game-ready。',
+  '- 2026-11-16 正式域 sledrun.app：三页完整状态链、GameOver、Play again 和独立存档再次通过。', '',
   '## Pages 与性能实测', '',
-  '- Wrangler Pages：三页 200；/unknown 404；/snow-road/ 301 到 /snow-road；OG 200。',
+  '- Pages v2 部署预览：https://5a2502e6.sledrun.pages.dev；三页 200、/unknown 404、尾斜杠 301、OG/favicon 200。',
+  '- R2 v2 上传 10 对象；入口/chunk 为 text/javascript，GLB 为 model/gltf-binary，DRACO/Basis WASM 为 application/wasm；v1 保留回滚。',
   '- 安全头：CSP、nosniff、Referrer-Policy、Permissions-Policy 已返回。',
-  '- LCP trace 修复后三次 Lighthouse：95/98/97；LCP 中位数 773.5ms；TBT 中位数 184ms；CLS 0.002454；总下载中位数 566467 bytes；本地性能闸通过。',
-  '- Loading/Start 持续 DOM 与 trace 详见 prompts/dev_piplines/ui_design/uiux/3d_extend/lcp_trace_report.md。',
-  '- 主共享游戏 chunk gzip 约 193.7KB；GLB 13648 bytes，含 DRACO/KTX2。',
-  '- 视觉复核详见 prompts/dev_piplines/ui_design/uiux/3d_extend/visual_review_report.md。',
+  '- 既有 3A 本地 Lighthouse 证据：95/98/97；LCP 中位数 773.5ms；TBT 中位数 184ms；CLS 0.002454。当前 P0 未重新运行 Lighthouse。',
+  '- 主共享游戏 chunk gzip 约 193.7KB；GLB 35156 bytes，含 DRACO/KTX2。',
   '- 解码器另载；完整首屏 JS、INP、TTFB 和帧率仍需按目标环境复核。', '',
   '## 待测', '',
-  '- WebPageTest、中端 Android 真机、Cloudflare 线上 301/404/TLS/R2 与回滚尚未实测。',
-  '- Q12 需线上 OG URL 验收后才能关闭。', '',
+  '- WebPageTest、中端 Android 真机、完整线上 INP/TTFB/帧率与回滚演练尚未完成。',
+  '- 本次仅关闭 P0 可玩性故障，不代表其他 3B 功能或全量性能验收完成。', '',
 ];
 await writeFile(path.join(root, 'docs/check-report.md'), `${lines.join('\n')}\n`);
 for (const item of results) console.log(`${item.result}: ${item.name}${item.detail ? ` — ${item.detail}` : ''}`);

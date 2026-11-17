@@ -70,8 +70,8 @@ npx wrangler pages deploy dist --project-name sledrun --branch main
 - Pages project: `sledrun`
 - R2 bucket: `sledrun-game-assets`
 - R2 binding: `SLEDRUN_ASSETS`
-- Game assets: `public/game/v1/**` → R2 keys `v1/**`
-- `/game/*` is served by `functions/game/[[path]].ts`, R2 first with static fallback.
+- Game assets: `public/game/v2/**` → R2 keys `v2/**`; `v1` is retained for rollback.
+- `/game/*` is served by `functions/game/[[path]].ts`, R2 first with static fallback and explicit MIME headers.
 
 ## Project structure
 
